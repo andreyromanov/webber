@@ -1,43 +1,35 @@
-/**
- * Подключим библиотеку puppeteer.
- */
 const puppeteer = require('puppeteer');
+const cheerio = require('cheerio');
 
-/**
- * В функции main размещаем код, который
- * будет использован в ходе веб-скрапинга.
- * Причина, по который мы создаём асинхронную функцию,
- * заключаемся в том, что мы хотим воспользоваться асинхронными
- * возможностями puppeteer.
- */
 async function main() {
-  /**
-   * Запускаем Chromium. Установив ключ `headless` в значение false,
-   * мы можем видеть интерфейс браузера.
-   */
+
   const browser = await puppeteer.launch({
-    headless: false
+    headless: true
   });
 
-  /**
-   * Создаём новую страницу.
-   */
+
   const page = await browser.newPage();
 
-  /**
-   * Используя новую страницу, переходим на https://api.ipify.org.
-   */
-  await page.goto('https://api.ipify.org');
+  await page.goto('https://dom.ria.com/uk/search/#links-under-filter=on&category=1&realty_type=0&operation_type=3&fullCategoryOperation=1_0_3&page=0&state_id=12&city_id=12&limit=30&sort=inspected_sort&period=0&csrf=KTIekYBV-KYClCWoJX0xVeJwlnkIXXLGNLa4&d_id=15250:15810:15815:17789:17854:17855:17856:17857:17858&ch=235_f_5500,235_t_6000,246_244');
 
-  /**
-   * Ждём 3 секунды и закрываем экземпляр браузера.
-   */
-  setTimeout(() => {
-    browser.close();
-  }, 30000);
+  const content = await page.content();
+
+  const $ = cheerio.load(content);
+  const titles = [];
+
+  $('.tit').slice(0, 10).each((idx, elem) => {
+    
+    const title = $(elem).text();
+  
+    
+    titles.push(title);
+  })
+
+    console.log(titles);
+
+
+  browser.close();
 }
 
-/**
- * Запускаем скрипт, вызвав main().
- */
+
 main();
