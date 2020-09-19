@@ -1,7 +1,18 @@
+const express = require('express')
+const app = express()
+const port = 3000
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const querystring = require('querystring');
 
+app.get('/', async (req, res, next) => {
+  const data = await main();
+  res.send(data);
+})
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})
 
 async function main() {
 
@@ -9,14 +20,13 @@ async function main() {
 
   const data = {
   'search[filter_float_price:from]': '5000',
-  'search[filter_float_price:to]': '6000'
+  'search[filter_float_price:to]': '6000',
+  'search[district_id]': '89'
   };
 
   const searchParams = querystring.stringify(data);
 
-  const browser = await puppeteer.launch({
-    headless: true
-  });
+  const browser = await puppeteer.launch({headless: true});
 
 
   const page = await browser.newPage();
@@ -29,23 +39,25 @@ async function main() {
 
   const $ = cheerio.load(content);
 
-  $('#offers_table .title-cell a').slice(0, 10).each((idx, elem) => {
+  $('#offers_table .offer-wrapper').slice(0, 10).each((idx, elem) => {
     
-    const title = $(elem).text().replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/g, ' ');
-  
+    const title = $(elem).find('.title-cell a').text().replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/g, ' ');
+    const price = $(elem).find('p.price').text().replace(/(\r\n|\n|\r)/gm, "").replace(/\s{2,}/g, ' ');
     
     articles.push({
       title : title,
-      price : '5000-6000',
+      price : price,
       source : 'olx'
     });
   })
 
-    console.log(JSON.stringify(articles));
-
-
+  //console.log(JSON.stringify(articles));
+  
   browser.close();
+
+  return JSON.stringify(articles);
 }
 
 
-main();
+//main();
+//need middleware
