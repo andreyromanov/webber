@@ -4,6 +4,7 @@ const port = 3000
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const querystring = require('querystring');
+//const got = require('got');
 
 app.get('/', async (req, res, next) => {
   const data = await main();
@@ -24,12 +25,20 @@ async function main() {
   'search[district_id]': '89'
   };
 
+  let search_id ='';
+
+  for (var prop in data) {
+    search_id +=data[prop];
+  
+}
+
   const searchParams = querystring.stringify(data);
 
   const browser = await puppeteer.launch({headless: true});
 
-
   const page = await browser.newPage();
+
+  //const content = await got('https://www.olx.ua/nedvizhimost/kvartiry-komnaty/arenda-kvartir-komnat/odessa/?' + searchParams);
 
   //await page.goto('https://dom.ria.com/uk/search/#links-under-filter=on&category=1&realty_type=0&operation_type=3&fullCategoryOperation=1_0_3&page=0&state_id=12&city_id=12&limit=30&sort=inspected_sort&period=0&csrf=KTIekYBV-KYClCWoJX0xVeJwlnkIXXLGNLa4&d_id=15250:15810:15815:17789:17854:17855:17856:17857:17858&ch=235_f_5500,235_t_6000,246_244');
   
